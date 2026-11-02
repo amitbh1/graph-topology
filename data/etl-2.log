@@ -1,0 +1,36 @@
+== mesh
+mesh: 31110 descriptors, 267012 entry-term links, 42519 hierarchy relationships
+== labels
+labels:   0%|          | 0/250 [00:00<?, ?it/s]labels:   0%|          | 1/250 [00:02<10:47,  2.60s/it]labels:   2%|1         | 4/250 [00:03<02:43,  1.50it/s]labels:   3%|2         | 7/250 [00:03<01:47,  2.27it/s]labels:   4%|3         | 9/250 [00:04<01:23,  2.88it/s]labels:   4%|4         | 10/250 [00:05<01:40,  2.40it/s]Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "A:\amit-sideproject\medical-agent\medgraph\__main__.py", line 105, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "A:\amit-sideproject\medical-agent\medgraph\__main__.py", line 68, in main
+    run(client, args.steps)
+    ~~~^^^^^^^^^^^^^^^^^^^^
+  File "A:\amit-sideproject\medical-agent\medgraph\etl\__init__.py", line 49, in run
+    available[step](client)
+    ~~~~~~~~~~~~~~~^^^^^^^^
+  File "A:\amit-sideproject\medical-agent\medgraph\etl\openfda_labels.py", line 132, in load_labels
+    rows = [r for r in (transform(l, matcher) for l in tqdm(raw, desc="labels")) if r]
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "A:\amit-sideproject\medical-agent\medgraph\etl\openfda_labels.py", line 132, in <genexpr>
+    rows = [r for r in (transform(l, matcher) for l in tqdm(raw, desc="labels")) if r]
+                        ~~~~~~~~~^^^^^^^^^^^^
+  File "A:\amit-sideproject\medical-agent\medgraph\etl\openfda_labels.py", line 74, in transform
+    drug, rxcui = canonical_ingredient(generic)
+                  ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "A:\amit-sideproject\medical-agent\medgraph\etl\rxnorm.py", line 44, in canonical_ingredient
+    related = rx_related(rxcui, "IN+MIN")
+  File "A:\amit-sideproject\medical-agent\medgraph\etl\rxnorm.py", line 28, in rx_related
+    data = get_json(f"{RXNAV}/rxcui/{rxcui}/related.json", {"tty": ttys}) or {}
+           ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "A:\amit-sideproject\medical-agent\medgraph\etl\common.py", line 41, in get_json
+    resp.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "A:\amit-sideproject\medical-agent\.venv\Lib\site-packages\requests\models.py", line 1167, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://rxnav.nlm.nih.gov/REST/rxcui/235743/related.json?tty=IN%2BMIN
+labels:   4%|4         | 10/250 [00:06<02:31,  1.59it/s]

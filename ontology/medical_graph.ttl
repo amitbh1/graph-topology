@@ -1,0 +1,204 @@
+@prefix mg:   <https://medgraph.local/ontology#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# =============================================================================
+# MedGraph ontology — the structural contract for the Neo4j graph.
+#
+# Every Neo4j node label is an owl:Class, every relationship type is an
+# owl:ObjectProperty with exactly one rdfs:domain and one rdfs:range.
+#
+#   mg:keyProperty     property that uniquely identifies a node (-> constraint)
+#   mg:embedText       comma-separated properties concatenated for embeddings
+#                      (classes with this annotation get a vector index)
+#
+# This is a lightweight development-time schema contract, NOT an OWL reasoning
+# model: no cardinality, disjointness or runtime validation is enforced.
+# =============================================================================
+
+<https://medgraph.local/ontology> a owl:Ontology ;
+    rdfs:label "MedGraph medical knowledge graph ontology" ;
+    owl:versionInfo "1.0.0" .
+
+mg:keyProperty a owl:AnnotationProperty ;
+    rdfs:comment "Property whose value uniquely identifies a node of the class." .
+
+mg:embedText a owl:AnnotationProperty ;
+    rdfs:comment "Comma-separated node properties used to build the embedding text." .
+
+# -----------------------------------------------------------------------------
+# Node classes (16)
+# -----------------------------------------------------------------------------
+
+mg:Drug a owl:Class ;
+    rdfs:label "Drug" ;
+    rdfs:comment "Canonical drug (generic / ingredient name, lower-case)." ;
+    mg:keyProperty "name" ;
+    mg:embedText "display" .
+
+mg:DrugAlias a owl:Class ;
+    rdfs:label "DrugAlias" ;
+    rdfs:comment "Brand name, salt form or ingredient synonym. Never a drug in its own right." ;
+    mg:keyProperty "name" ;
+    mg:embedText "display" .
+
+mg:ATCLevel a owl:Class ;
+    rdfs:label "ATCLevel" ;
+    rdfs:comment "One level (1-5) of the WHO Anatomical Therapeutic Chemical classification." ;
+    mg:keyProperty "code" ;
+    mg:embedText "code,name" .
+
+mg:MeshDescriptor a owl:Class ;
+    rdfs:label "MeshDescriptor" ;
+    rdfs:comment "MeSH descriptor (main heading). Multi-parent hierarchy via MESH_PARENT." ;
+    mg:keyProperty "ui" ;
+    mg:embedText "name,scope_note" .
+
+mg:MeshEntryTerm a owl:Class ;
+    rdfs:label "MeshEntryTerm" ;
+    rdfs:comment "Synonym / entry term of a MeSH descriptor (lower-case). Includes the preferred name." ;
+    mg:keyProperty "name" ;
+    mg:embedText "display" .
+
+mg:ICD10Code a owl:Class ;
+    rdfs:label "ICD10Code" ;
+    rdfs:comment "ICD-10-CM diagnosis code (NLM Clinical Tables)." ;
+    mg:keyProperty "code" ;
+    mg:embedText "code,name" .
+
+mg:DrugLabel a owl:Class ;
+    rdfs:label "DrugLabel" ;
+    rdfs:comment "openFDA structured product label (the searchable medical document)." ;
+    mg:keyProperty "label_id" ;
+    mg:embedText "title,indications" .
+
+mg:Manufacturer a owl:Class ;
+    rdfs:label "Manufacturer" ;
+    rdfs:comment "Labeler / manufacturer named on a drug label." ;
+    mg:keyProperty "name" ;
+    mg:embedText "display" .
+
+mg:PharmClass a owl:Class ;
+    rdfs:label "PharmClass" ;
+    rdfs:comment "FDA established pharmacologic class (EPC)." ;
+    mg:keyProperty "name" ;
+    mg:embedText "display" .
+
+mg:IndicationTerm a owl:Class ;
+    rdfs:label "IndicationTerm" ;
+    rdfs:comment "Indication phrase extracted from a label's Indications & Usage section." ;
+    mg:keyProperty "name" ;
+    mg:embedText "display" .
+
+mg:AdverseEventReport a owl:Class ;
+    rdfs:label "AdverseEventReport" ;
+    rdfs:comment "openFDA FAERS safety report. A reported association, not proof of causation." ;
+    mg:keyProperty "report_id" .
+
+mg:Reaction a owl:Class ;
+    rdfs:label "Reaction" ;
+    rdfs:comment "Reported reaction term (MedDRA preferred term, lower-case)." ;
+    mg:keyProperty "name" ;
+    mg:embedText "display" .
+
+mg:ClinicalTrial a owl:Class ;
+    rdfs:label "ClinicalTrial" ;
+    rdfs:comment "ClinicalTrials.gov study." ;
+    mg:keyProperty "nct_id" ;
+    mg:embedText "title" .
+
+mg:Sponsor a owl:Class ;
+    rdfs:label "Sponsor" ;
+    rdfs:comment "Lead sponsor of a clinical trial." ;
+    mg:keyProperty "name" ;
+    mg:embedText "display" .
+
+mg:Condition a owl:Class ;
+    rdfs:label "Condition" ;
+    rdfs:comment "Condition as written in a clinical trial record (lower-case)." ;
+    mg:keyProperty "name" ;
+    mg:embedText "display" .
+
+mg:Intervention a owl:Class ;
+    rdfs:label "Intervention" ;
+    rdfs:comment "Drug intervention named in a clinical trial (lower-case)." ;
+    mg:keyProperty "name" .
+
+# -----------------------------------------------------------------------------
+# Relationship types
+# -----------------------------------------------------------------------------
+
+# --- Vocabulary -------------------------------------------------------------
+mg:ATC_PARENT a owl:ObjectProperty ;
+    rdfs:comment "ATC level -> its broader ATC level (strict tree)." ;
+    rdfs:domain mg:ATCLevel ; rdfs:range mg:ATCLevel .
+
+mg:CLASSIFIED_AS a owl:ObjectProperty ;
+    rdfs:comment "Drug -> its ATC level-5 chemical substance code." ;
+    rdfs:domain mg:Drug ; rdfs:range mg:ATCLevel .
+
+mg:MESH_PARENT a owl:ObjectProperty ;
+    rdfs:comment "MeSH descriptor -> broader descriptor (a descriptor may have many parents)." ;
+    rdfs:domain mg:MeshDescriptor ; rdfs:range mg:MeshDescriptor .
+
+mg:HAS_ENTRY_TERM a owl:ObjectProperty ;
+    rdfs:domain mg:MeshDescriptor ; rdfs:range mg:MeshEntryTerm .
+
+mg:HAS_ICD10 a owl:ObjectProperty ;
+    rdfs:domain mg:MeshDescriptor ; rdfs:range mg:ICD10Code .
+
+# --- Drug identity & labels -------------------------------------------------
+mg:ALIAS_OF a owl:ObjectProperty ;
+    rdfs:comment "Alias (brand / ingredient synonym) -> canonical drug." ;
+    rdfs:domain mg:DrugAlias ; rdfs:range mg:Drug .
+
+mg:HAS_LABEL a owl:ObjectProperty ;
+    rdfs:domain mg:Drug ; rdfs:range mg:DrugLabel .
+
+mg:MANUFACTURED_BY a owl:ObjectProperty ;
+    rdfs:domain mg:DrugLabel ; rdfs:range mg:Manufacturer .
+
+mg:HAS_PHARM_CLASS a owl:ObjectProperty ;
+    rdfs:domain mg:Drug ; rdfs:range mg:PharmClass .
+
+mg:INDICATED_FOR a owl:ObjectProperty ;
+    rdfs:comment "Drug -> indication term extracted from its label." ;
+    rdfs:domain mg:Drug ; rdfs:range mg:IndicationTerm .
+
+mg:INDICATION_MAPS_TO a owl:ObjectProperty ;
+    rdfs:domain mg:IndicationTerm ; rdfs:range mg:MeshDescriptor .
+
+# --- Drug safety ------------------------------------------------------------
+mg:SUSPECT_IN a owl:ObjectProperty ;
+    rdfs:comment "Drug reported as a suspect drug in a FAERS report." ;
+    rdfs:domain mg:Drug ; rdfs:range mg:AdverseEventReport .
+
+mg:HAS_REACTION a owl:ObjectProperty ;
+    rdfs:domain mg:AdverseEventReport ; rdfs:range mg:Reaction .
+
+mg:REACTION_MAPS_TO a owl:ObjectProperty ;
+    rdfs:domain mg:Reaction ; rdfs:range mg:MeshDescriptor .
+
+# --- Clinical trials --------------------------------------------------------
+mg:SPONSORED_BY a owl:ObjectProperty ;
+    rdfs:domain mg:ClinicalTrial ; rdfs:range mg:Sponsor .
+
+mg:STUDIES_CONDITION a owl:ObjectProperty ;
+    rdfs:domain mg:ClinicalTrial ; rdfs:range mg:Condition .
+
+mg:CONDITION_MAPS_TO a owl:ObjectProperty ;
+    rdfs:domain mg:Condition ; rdfs:range mg:MeshDescriptor .
+
+mg:TESTS_INTERVENTION a owl:ObjectProperty ;
+    rdfs:domain mg:ClinicalTrial ; rdfs:range mg:Intervention .
+
+mg:INTERVENTION_IS a owl:ObjectProperty ;
+    rdfs:comment "Trial intervention resolved to a canonical drug." ;
+    rdfs:domain mg:Intervention ; rdfs:range mg:Drug .
+
+# --- Analytics --------------------------------------------------------------
+mg:SIMILAR_TO a owl:ObjectProperty ;
+    rdfs:comment "Exploratory similarity: score = shared_indications * 2 + shared_reactions. Not a clinical recommendation." ;
+    rdfs:domain mg:Drug ; rdfs:range mg:Drug .

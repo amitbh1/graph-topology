@@ -1,0 +1,321 @@
+// ============================================================================
+// 1. DATA SOURCES CATALOG (eg:DataSource)
+// ============================================================================
+MERGE (src_gleif:DataSource {source_id: "gleif_lei_api", name: "GLEIF LEI Direct Master", entitlement: "public", as_of: "2026-01-01"});
+MERGE (src_platts:DataSource {source_id: "sp_global_platts", name: "S&P Global Platts Energy DB", entitlement: "public", as_of: "2026-01-01"});
+MERGE (src_eia:DataSource {source_id: "us_eia_open_data", name: "US EIA Infrastructure", entitlement: "public", as_of: "2026-01-01"});
+MERGE (src_entsog:DataSource {source_id: "entsog_transparency", name: "ENTSOG Gas Transparency", entitlement: "public", as_of: "2026-01-01"});
+MERGE (src_news:DataSource {source_id: "reuters_energy_feed", name: "Reuters Energy News Feed", entitlement: "public", as_of: "2026-01-01"});
+
+// ============================================================================
+// 2. GEOGRAPHIC REGIONS (eg:Region & eg:REGION_PARENT)
+// ============================================================================
+MERGE (reg_global:Region {code: "GLB", name: "Global", source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"});
+
+MERGE (reg_gbr:Region {code: "GBR", name: "United Kingdom", source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"});
+MERGE (reg_fra:Region {code: "FRA", name: "France", source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"});
+MERGE (reg_nor:Region {code: "NOR", name: "Norway", source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"});
+MERGE (reg_nld:Region {code: "NLD", name: "Netherlands", source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"});
+MERGE (reg_ita:Region {code: "ITA", name: "Italy", source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"});
+MERGE (reg_esp:Region {code: "ESP", name: "Spain", source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"});
+MERGE (reg_dnk:Region {code: "DNK", name: "Denmark", source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"});
+MERGE (reg_usa:Region {code: "USA", name: "United States", source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"});
+MERGE (reg_can:Region {code: "CAN", name: "Canada", source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"});
+MERGE (reg_deu:Region {code: "DEU", name: "Germany", source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"});
+
+// Sub-regions
+MERGE (reg_tx:Region {code: "US-TX", name: "Texas, United States", source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"});
+MERGE (reg_la:Region {code: "US-LA", name: "Louisiana, United States", source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"});
+MERGE (reg_ns:Region {code: "NOR-NS", name: "Norwegian North Sea Basin", source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"});
+
+// Region hierarchy
+MERGE (reg_gbr)-[:REGION_PARENT {source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"}]->(reg_global);
+MERGE (reg_tx)-[:REGION_PARENT {source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"}]->(reg_usa);
+MERGE (reg_la)-[:REGION_PARENT {source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"}]->(reg_usa);
+MERGE (reg_ns)-[:REGION_PARENT {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(reg_nor);
+
+// ============================================================================
+// 3. TAXONOMY CONCEPTS (eg:Concept & eg:CONCEPT_PARENT)
+// ============================================================================
+MERGE (c_energy:Concept {code: "ENERGY", label: "Energy Commodity & Technology", definition: "Top level energy root taxonomy", source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"});
+MERGE (c_hydrocarbon:Concept {code: "HYDROCARBONS", label: "Fossil Hydrocarbons", definition: "Petroleum, condensates and gaseous fuels", source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"});
+MERGE (c_renewables:Concept {code: "RENEWABLES", label: "Renewable Energy", definition: "Solar, wind, battery and zero-carbon generation", source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"});
+
+MERGE (c_crude:Concept {code: "CRUDE_OIL", label: "Crude Oil", definition: "Unrefined liquid petroleum", source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"});
+MERGE (c_diesel:Concept {code: "DIESEL", label: "Ultra Low Sulfur Diesel", definition: "Refined middle distillate fuel", source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"});
+MERGE (c_natgas:Concept {code: "NAT_GAS", label: "Natural Gas", definition: "Methane rich pipeline gas", source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"});
+MERGE (c_lng:Concept {code: "LNG", label: "Liquefied Natural Gas", definition: "Methane cooled to liquid state at -162C", source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"});
+MERGE (c_solar:Concept {code: "SOLAR_PV", label: "Solar Photovoltaic", definition: "Solar cell power generation", source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"});
+MERGE (c_offshore_wind:Concept {code: "OFFSHORE_WIND", label: "Offshore Wind", definition: "Marine wind turbines", source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"});
+MERGE (c_onshore_wind:Concept {code: "ONSHORE_WIND", label: "Onshore Wind", definition: "Terrestrial wind power turbines", source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"});
+MERGE (c_bess:Concept {code: "BESS", label: "Battery Energy Storage System", definition: "Grid scale chemical battery storage", source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"});
+
+// Hierarchy links
+MERGE (c_hydrocarbon)-[:CONCEPT_PARENT {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(c_energy);
+MERGE (c_renewables)-[:CONCEPT_PARENT {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(c_energy);
+MERGE (c_crude)-[:CONCEPT_PARENT {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(c_hydrocarbon);
+MERGE (c_diesel)-[:CONCEPT_PARENT {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(c_hydrocarbon);
+MERGE (c_natgas)-[:CONCEPT_PARENT {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(c_hydrocarbon);
+MERGE (c_lng)-[:CONCEPT_PARENT {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(c_natgas);
+MERGE (c_solar)-[:CONCEPT_PARENT {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(c_renewables);
+MERGE (c_offshore_wind)-[:CONCEPT_PARENT {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(c_renewables);
+MERGE (c_onshore_wind)-[:CONCEPT_PARENT {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(c_renewables);
+MERGE (c_bess)-[:CONCEPT_PARENT {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(c_renewables);
+
+// ============================================================================
+// 4. PRICING HUBS & TIME SERIES (eg:Hub, eg:PriceSeries, eg:PRICED_AT, eg:SERIES_FOR)
+// ============================================================================
+MERGE (hub_henry:Hub {code: "HUB_HENRY", name: "Henry Hub Louisiana", source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"});
+MERGE (hub_ttf:Hub {code: "HUB_TTF", name: "Title Transfer Facility Netherlands", source: "entsog_transparency", entitlement: "public", as_of: "2026-01-01"});
+MERGE (hub_brent:Hub {code: "HUB_BRENT_SULLOM", name: "Sullom Voe Terminal Brent", source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"});
+
+MERGE (hub_henry)-[:HUB_IN {source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"}]->(reg_la);
+MERGE (hub_ttf)-[:HUB_IN {source: "entsog_transparency", entitlement: "public", as_of: "2026-01-01"}]->(reg_nld);
+MERGE (hub_brent)-[:HUB_IN {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(reg_gbr);
+
+MERGE (ps_hh:PriceSeries {series_id: "PS_HH_SPOT", name: "Henry Hub Natural Gas Spot Price", unit: "USD/MMBtu", source: "us_eia_open_data", entitlement: "public", as_of: "2026-04-01"});
+MERGE (ps_ttf:PriceSeries {series_id: "PS_TTF_DAYAHEAD", name: "Dutch TTF Natural Gas Day-Ahead", unit: "EUR/MWh", source: "entsog_transparency", entitlement: "public", as_of: "2026-04-01"});
+MERGE (ps_brent:PriceSeries {series_id: "PS_BRENT_DATED", name: "Platts Dated Brent Benchmark", unit: "USD/bbl", source: "sp_global_platts", entitlement: "public", as_of: "2026-04-01"});
+
+MERGE (ps_hh)-[:PRICED_AT {source: "us_eia_open_data", entitlement: "public", as_of: "2026-04-01"}]->(hub_henry);
+MERGE (ps_hh)-[:SERIES_FOR {source: "us_eia_open_data", entitlement: "public", as_of: "2026-04-01"}]->(c_natgas);
+
+MERGE (ps_ttf)-[:PRICED_AT {source: "entsog_transparency", entitlement: "public", as_of: "2026-04-01"}]->(hub_ttf);
+MERGE (ps_ttf)-[:SERIES_FOR {source: "entsog_transparency", entitlement: "public", as_of: "2026-04-01"}]->(c_natgas);
+
+MERGE (ps_brent)-[:PRICED_AT {source: "sp_global_platts", entitlement: "public", as_of: "2026-04-01"}]->(hub_brent);
+MERGE (ps_brent)-[:SERIES_FOR {source: "sp_global_platts", entitlement: "public", as_of: "2026-04-01"}]->(c_crude);
+
+// ============================================================================
+// 5. THE 10 COMPANIES, SUBSIDIARIES, ASSETS, AND TRACEABLE FLOWS
+// ============================================================================
+
+// ----------------------------------------------------------------------------
+// COMPANY 1: Shell plc
+// ----------------------------------------------------------------------------
+MERGE (c1:Company {company_id: "LEI_SHELL_21380068P1DRHMJ8KU70", name: "Shell plc", country: "GBR", source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"});
+MERGE (c1_sub:Company {company_id: "LEI_SHELL_NL_OPS", name: "Shell Nederland Raffinaderij B.V.", country: "NLD", source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"});
+MERGE (c1_alias:CompanyAlias {name: "Royal Dutch Shell", display: "Royal Dutch Shell (Historic)", source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"});
+MERGE (c1)-[:HEADQUARTERED_IN {source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"}]->(reg_gbr);
+MERGE (c1_sub)-[:SUBSIDIARY_OF {source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"}]->(c1);
+MERGE (c1_alias)-[:ALIAS_OF {source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"}]->(c1);
+
+// Asset 1.1: Pernis Refinery
+MERGE (a_pernis:Asset:Refinery {asset_id: "AST_SHELL_PERNIS", name: "Pernis Refinery Rotterdam", asset_type: "Refinery", country: "NLD", source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"});
+MERGE (a_pernis)-[:LOCATED_IN {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(reg_nld);
+MERGE (a_pernis)-[:USES {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(c_crude);
+MERGE (c1_sub)-[:OPERATES {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(a_pernis);
+MERGE (c1)-[:OWNS {equity_share: 1.0, source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(a_pernis);
+
+// Asset 1.2: Prelude FLNG
+MERGE (a_prelude:Asset:LNGTerminal {asset_id: "AST_SHELL_PRELUDE", name: "Prelude Floating LNG", asset_type: "LNGTerminal", country: "AUS", source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"});
+MERGE (a_prelude)-[:USES {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(c_lng);
+MERGE (c1)-[:OWNS {equity_share: 0.675, source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(a_prelude);
+
+// Incident on Pernis
+MERGE (inc_pernis:Incident {incident_id: "INC_SHL_2026_01", incident_type: "Flaring Outage", description: "Power fluctuation causing flaring at crude distillation unit 4", source: "reuters_energy_feed", entitlement: "public", as_of: "2026-03-12"});
+MERGE (a_pernis)-[:HAD_INCIDENT {source: "reuters_energy_feed", entitlement: "public", as_of: "2026-03-12"}]->(inc_pernis);
+
+// Project expanding Pernis
+MERGE (proj_pernis_h2:Project {project_id: "PRJ_SHL_HOLLAND_H2_1", name: "Holland Hydrogen I Renewable Electrolyser", status: "Under Construction", source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"});
+MERGE (c1)-[:DEVELOPS {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(proj_pernis_h2);
+MERGE (proj_pernis_h2)-[:PROJECT_LOCATED_IN {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(reg_nld);
+MERGE (proj_pernis_h2)-[:EXPANDS {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(a_pernis);
+
+// ----------------------------------------------------------------------------
+// COMPANY 2: TotalEnergies SE
+// ----------------------------------------------------------------------------
+MERGE (c2:Company {company_id: "LEI_TOTAL_529900S2157HI73PPQ05", name: "TotalEnergies SE", country: "FRA", source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"});
+MERGE (c2_alias:CompanyAlias {name: "Total S.A.", display: "Total (Old Name)", source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"});
+MERGE (c2)-[:HEADQUARTERED_IN {source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"}]->(reg_fra);
+MERGE (c2_alias)-[:ALIAS_OF {source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"}]->(c2);
+
+// Asset 2.1: Gonfreville Refinery (Normandy)
+MERGE (a_normandy:Asset:Refinery {asset_id: "AST_TOT_NORMANDY", name: "Gonfreville l'Orcher Refinery", asset_type: "Refinery", country: "FRA", source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"});
+MERGE (a_normandy)-[:LOCATED_IN {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(reg_fra);
+MERGE (a_normandy)-[:USES {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(c_diesel);
+MERGE (c2)-[:OWNS {equity_share: 1.0, source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(a_normandy);
+MERGE (c2)-[:OPERATES {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(a_normandy);
+
+// Asset 2.2: Clearway Solar Plant (Texas, US)
+MERGE (a_tot_solar:Asset:PowerPlant {asset_id: "AST_TOT_MYRTLE_SOLAR", name: "Myrtle Solar Facility", asset_type: "PowerPlant", country: "USA", source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"});
+MERGE (a_tot_solar)-[:LOCATED_IN {source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"}]->(reg_tx);
+MERGE (a_tot_solar)-[:USES {source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"}]->(c_solar);
+MERGE (c2)-[:OWNS {equity_share: 0.50, source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"}]->(a_tot_solar);
+
+// Peer similarity: Pernis & Normandy refineries
+MERGE (a_pernis)-[:SIMILAR_TO {score: 0.92, basis: "Complexity index and Nelson ranking in ARA/Northwest Europe", source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(a_normandy);
+
+// ----------------------------------------------------------------------------
+// COMPANY 3: Equinor ASA
+// ----------------------------------------------------------------------------
+MERGE (c3:Company {company_id: "LEI_EQUINOR_549300BNRFQ9OSDA9563", name: "Equinor ASA", country: "NOR", source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"});
+MERGE (c3_alias:CompanyAlias {name: "Statoil", display: "Statoil ASA", source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"});
+MERGE (c3)-[:HEADQUARTERED_IN {source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"}]->(reg_nor);
+MERGE (c3_alias)-[:ALIAS_OF {source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"}]->(c3);
+
+// Asset 3.1: Troll Gas Field
+MERGE (a_troll:Asset:Field {asset_id: "AST_EQNR_TROLL", name: "Troll Offshore Gas Field", asset_type: "Field", country: "NOR", source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"});
+MERGE (a_troll)-[:LOCATED_IN {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(reg_ns);
+MERGE (a_troll)-[:USES {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(c_natgas);
+MERGE (c3)-[:OWNS {equity_share: 0.3058, source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(a_troll);
+MERGE (c3)-[:OPERATES {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(a_troll);
+
+// Asset 3.2: Gassled Europipe II
+MERGE (a_europipe:Asset:Pipeline {asset_id: "AST_EQNR_EUROPIPE2", name: "Europipe II Export Pipeline", asset_type: "Pipeline", country: "DEU", source: "entsog_transparency", entitlement: "public", as_of: "2026-01-01"});
+MERGE (a_europipe)-[:LOCATED_IN {source: "entsog_transparency", entitlement: "public", as_of: "2026-01-01"}]->(reg_deu);
+MERGE (a_europipe)-[:USES {source: "entsog_transparency", entitlement: "public", as_of: "2026-01-01"}]->(c_natgas);
+
+// Connection: Troll Field flows into Europipe II
+MERGE (a_troll)-[:CONNECTS_TO {flow_direction: "unidirectional", capacity_mcm_day: 70.0, source: "entsog_transparency", entitlement: "public", as_of: "2026-01-01"}]->(a_europipe);
+
+// ----------------------------------------------------------------------------
+// COMPANY 4: Eni S.p.A.
+// ----------------------------------------------------------------------------
+MERGE (c4:Company {company_id: "LEI_ENI_54930056H9H1EOW00366", name: "Eni S.p.A.", country: "ITA", source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"});
+MERGE (c4)-[:HEADQUARTERED_IN {source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"}]->(reg_ita);
+
+// Asset 4.1: Zohr Gas Field (Egypt offshore / Mediterranean)
+MERGE (a_zohr:Asset:Field {asset_id: "AST_ENI_ZOHR", name: "Zohr Giant Offshore Gas Field", asset_type: "Field", country: "EGY", source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"});
+MERGE (a_zohr)-[:USES {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(c_natgas);
+MERGE (c4)-[:OWNS {equity_share: 0.50, source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(a_zohr);
+MERGE (c4)-[:OPERATES {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(a_zohr);
+
+// Asset 4.2: Minerbio Underground Gas Storage
+MERGE (a_minerbio:Asset:StorageSite {asset_id: "AST_ENI_MINERBIO_UGS", name: "Minerbio Gas Storage Facility", asset_type: "StorageSite", country: "ITA", source: "entsog_transparency", entitlement: "public", as_of: "2026-01-01"});
+MERGE (a_minerbio)-[:LOCATED_IN {source: "entsog_transparency", entitlement: "public", as_of: "2026-01-01"}]->(reg_ita);
+MERGE (a_minerbio)-[:USES {source: "entsog_transparency", entitlement: "public", as_of: "2026-01-01"}]->(c_natgas);
+
+// ----------------------------------------------------------------------------
+// COMPANY 5: BP p.l.c.
+// ----------------------------------------------------------------------------
+MERGE (c5:Company {company_id: "LEI_BP_5493001Q1IZNJXCC9802", name: "BP p.l.c.", country: "GBR", source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"});
+MERGE (c5_alias:CompanyAlias {name: "British Petroleum", display: "British Petroleum Historical", source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"});
+MERGE (c5)-[:HEADQUARTERED_IN {source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"}]->(reg_gbr);
+MERGE (c5_alias)-[:ALIAS_OF {source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"}]->(c5);
+
+// Asset 5.1: Whiting Refinery (Indiana, USA)
+MERGE (a_whiting:Asset:Refinery {asset_id: "AST_BP_WHITING", name: "Whiting Refinery", asset_type: "Refinery", country: "USA", source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"});
+MERGE (a_whiting)-[:LOCATED_IN {source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"}]->(reg_usa);
+MERGE (a_whiting)-[:USES {source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"}]->(c_crude);
+MERGE (c5)-[:OWNS {equity_share: 1.0, source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"}]->(a_whiting);
+MERGE (c5)-[:OPERATES {source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"}]->(a_whiting);
+
+// Asset 5.2: Fowler Ridge Wind Farm
+MERGE (a_fowler:Asset:PowerPlant {asset_id: "AST_BP_FOWLER_WIND", name: "Fowler Ridge Wind Farm", asset_type: "PowerPlant", country: "USA", source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"});
+MERGE (a_fowler)-[:LOCATED_IN {source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"}]->(reg_usa);
+MERGE (a_fowler)-[:USES {source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"}]->(c_onshore_wind);
+MERGE (c5)-[:OWNS {equity_share: 0.50, source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"}]->(a_fowler);
+
+// Document mentioning BP
+MERGE (doc_bp:Document {doc_id: "DOC_FT_2026_03", title: "BP Expands Renewable Hydrogen Strategy at Whiting", text: "BP announced engineering milestones for green hydrogen integration into refinery operations.", source: "reuters_energy_feed", entitlement: "public", as_of: "2026-03-20"});
+MERGE (doc_bp)-[:MENTIONS_COMPANY {source: "reuters_energy_feed", entitlement: "public", as_of: "2026-03-20"}]->(c5);
+MERGE (doc_bp)-[:MENTIONS_ASSET {source: "reuters_energy_feed", entitlement: "public", as_of: "2026-03-20"}]->(a_whiting);
+
+// ----------------------------------------------------------------------------
+// COMPANY 6: Iberdrola S.A.
+// ----------------------------------------------------------------------------
+MERGE (c6:Company {company_id: "LEI_IBERDROLA_549300G21X357QDYK024", name: "Iberdrola S.A.", country: "ESP", source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"});
+MERGE (c6_sub:Company {company_id: "LEI_AVANGRID_USA", name: "Avangrid, Inc.", country: "USA", source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"});
+MERGE (c6)-[:HEADQUARTERED_IN {source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"}]->(reg_esp);
+MERGE (c6_sub)-[:SUBSIDIARY_OF {source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"}]->(c6);
+
+// Asset 6.1: Nuñez de Balboa Solar Plant
+MERGE (a_nunez:Asset:PowerPlant {asset_id: "AST_IBE_NUNEZ_BALBOA", name: "Nuñez de Balboa Solar Plant", asset_type: "PowerPlant", country: "ESP", source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"});
+MERGE (a_nunez)-[:LOCATED_IN {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(reg_esp);
+MERGE (a_nunez)-[:USES {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(c_solar);
+MERGE (c6)-[:OWNS {equity_share: 1.0, source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(a_nunez);
+
+// Asset 6.2: Tâmega Gigabattery Pumped Hydro Storage
+MERGE (a_tamega:Asset:StorageSite {asset_id: "AST_IBE_TAMEGA", name: "Tâmega Hydro-Electric Storage Complex", asset_type: "StorageSite", country: "PRT", source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"});
+MERGE (a_tamega)-[:USES {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(c_bess);
+MERGE (c6)-[:OWNS {equity_share: 1.0, source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(a_tamega);
+
+// ----------------------------------------------------------------------------
+// COMPANY 7: Ørsted A/S
+// ----------------------------------------------------------------------------
+MERGE (c7:Company {company_id: "LEI_ORSTED_W22LROWP2IHZNBB6K528", name: "Ørsted A/S", country: "DNK", source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"});
+MERGE (c7_alias:CompanyAlias {name: "DONG Energy", display: "DONG Energy (Danish Oil and Natural Gas)", source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"});
+MERGE (c7)-[:HEADQUARTERED_IN {source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"}]->(reg_dnk);
+MERGE (c7_alias)-[:ALIAS_OF {source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"}]->(c7);
+
+// Asset 7.1: Hornsea 2 Offshore Wind Farm
+MERGE (a_hornsea:Asset:PowerPlant {asset_id: "AST_ORSTED_HORNSEA_2", name: "Hornsea Two Offshore Wind Farm", asset_type: "PowerPlant", country: "GBR", source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"});
+MERGE (a_hornsea)-[:LOCATED_IN {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(reg_gbr);
+MERGE (a_hornsea)-[:USES {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(c_offshore_wind);
+MERGE (c7)-[:OWNS {equity_share: 0.50, source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(a_hornsea);
+MERGE (c7)-[:OPERATES {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(a_hornsea);
+
+// Project 7.1: Hornsea 3 Expansion
+MERGE (proj_hornsea3:Project {project_id: "PRJ_ORSTED_HORNSEA_3", name: "Hornsea Three Offshore Wind Project", status: "FID", source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"});
+MERGE (c7)-[:DEVELOPS {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(proj_hornsea3);
+MERGE (proj_hornsea3)-[:PROJECT_LOCATED_IN {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(reg_gbr);
+MERGE (proj_hornsea3)-[:PROJECT_USES {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(c_offshore_wind);
+MERGE (proj_hornsea3)-[:EXPANDS {source: "sp_global_platts", entitlement: "public", as_of: "2026-01-01"}]->(a_hornsea);
+
+// ----------------------------------------------------------------------------
+// COMPANY 8: Cheniere Energy, Inc.
+// ----------------------------------------------------------------------------
+MERGE (c8:Company {company_id: "LEI_CHENIERE_549300H2F44S971M3E20", name: "Cheniere Energy, Inc.", country: "USA", source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"});
+MERGE (c8)-[:HEADQUARTERED_IN {source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"}]->(reg_tx);
+
+// Asset 8.1: Sabine Pass LNG Terminal
+MERGE (a_sabine_lng:Asset:LNGTerminal {asset_id: "AST_CHENIERE_SABINE_PASS", name: "Sabine Pass LNG Export Terminal", asset_type: "LNGTerminal", country: "USA", source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"});
+MERGE (a_sabine_lng)-[:LOCATED_IN {source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"}]->(reg_la);
+MERGE (a_sabine_lng)-[:USES {source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"}]->(c_lng);
+MERGE (c8)-[:OWNS {equity_share: 1.0, source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"}]->(a_sabine_lng);
+MERGE (c8)-[:OPERATES {source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"}]->(a_sabine_lng);
+
+// Asset 8.2: Creole Trail Pipeline (Feeds Sabine Pass)
+MERGE (a_creole_pipe:Asset:Pipeline {asset_id: "AST_CHENIERE_CREOLE_TRAIL", name: "Creole Trail Feedgas Pipeline", asset_type: "Pipeline", country: "USA", source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"});
+MERGE (a_creole_pipe)-[:LOCATED_IN {source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"}]->(reg_la);
+MERGE (a_creole_pipe)-[:USES {source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"}]->(c_natgas);
+MERGE (c8)-[:OWNS {equity_share: 1.0, source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"}]->(a_creole_pipe);
+
+// Connection: Creole Trail Pipeline directly feeds Sabine Pass Liquefaction Train
+MERGE (a_creole_pipe)-[:CONNECTS_TO {flow_direction: "unidirectional", capacity_bcf_d: 1.5, source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"}]->(a_sabine_lng);
+
+// ----------------------------------------------------------------------------
+// COMPANY 9: Enbridge Inc.
+// ----------------------------------------------------------------------------
+MERGE (c9:Company {company_id: "LEI_ENBRIDGE_549300F74W299X8M0741", name: "Enbridge Inc.", country: "CAN", source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"});
+MERGE (c9)-[:HEADQUARTERED_IN {source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"}]->(reg_can);
+
+// Asset 9.1: Enbridge Mainline Pipeline System
+MERGE (a_mainline:Asset:Pipeline {asset_id: "AST_ENB_MAINLINE_CA_US", name: "Enbridge Mainline System", asset_type: "Pipeline", country: "CAN", source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"});
+MERGE (a_mainline)-[:LOCATED_IN {source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"}]->(reg_can);
+MERGE (a_mainline)-[:USES {source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"}]->(c_crude);
+MERGE (c9)-[:OWNS {equity_share: 1.0, source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"}]->(a_mainline);
+MERGE (c9)-[:OPERATES {source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"}]->(a_mainline);
+
+// Asset 9.2: Cushing Crude Storage Terminal
+MERGE (a_cushing:Asset:StorageSite {asset_id: "AST_ENB_CUSHING_TERMINAL", name: "Enbridge Cushing Tank Farm", asset_type: "StorageSite", country: "USA", source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"});
+MERGE (a_cushing)-[:LOCATED_IN {source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"}]->(reg_usa);
+MERGE (a_cushing)-[:USES {source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"}]->(c_crude);
+MERGE (c9)-[:OWNS {equity_share: 1.0, source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"}]->(a_cushing);
+
+// Connection: Mainline connects into Cushing hub storage
+MERGE (a_mainline)-[:CONNECTS_TO {flow_direction: "unidirectional", commodity: "Heavy Crude", source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"}]->(a_cushing);
+
+// ----------------------------------------------------------------------------
+// COMPANY 10: NextEra Energy, Inc.
+// ----------------------------------------------------------------------------
+MERGE (c10:Company {company_id: "LEI_NEXTERA_1F8P907G5R279K1Q0933", name: "NextEra Energy, Inc.", country: "USA", source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"});
+MERGE (c10_sub:Company {company_id: "LEI_FPL_FLORIDA_POWER_LIGHT", name: "Florida Power & Light Company", country: "USA", source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"});
+MERGE (c10_alias:CompanyAlias {name: "FPL Group", display: "FPL Group Historic", source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"});
+MERGE (c10)-[:HEADQUARTERED_IN {source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"}]->(reg_usa);
+MERGE (c10_sub)-[:SUBSIDIARY_OF {source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"}]->(c10);
+MERGE (c10_alias)-[:ALIAS_OF {source: "gleif_lei_api", entitlement: "public", as_of: "2026-01-01"}]->(c10);
+
+// Asset 10.1: Manatee Energy Storage Center (Largest integrated solar-powered BESS)
+MERGE (a_manatee:Asset:StorageSite {asset_id: "AST_NEE_MANATEE_BESS", name: "Manatee Energy Storage Center", asset_type: "StorageSite", country: "USA", source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"});
+MERGE (a_manatee)-[:LOCATED_IN {source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"}]->(reg_usa);
+MERGE (a_manatee)-[:USES {source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"}]->(c_bess);
+MERGE (c10_sub)-[:OWNS {equity_share: 1.0, source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"}]->(a_manatee);
+MERGE (c10_sub)-[:OPERATES {source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"}]->(a_manatee);
+
+// Asset 10.2: Desert Sunlight Solar Farm
+MERGE (a_desert_solar:Asset:PowerPlant {asset_id: "AST_NEE_DESERT_SUNLIGHT", name: "Desert Sunlight Solar Farm", asset_type: "PowerPlant", country: "USA", source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"});
+MERGE (a_desert_solar)-[:LOCATED_IN {source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"}]->(reg_usa);
+MERGE (a_desert_solar)-[:USES {source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"}]->(c_solar);
+MERGE (c10)-[:OWNS {equity_share: 0.50, source: "us_eia_open_data", entitlement: "public", as_of: "2026-01-01"}]->(a_desert_solar);

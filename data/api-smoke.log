@@ -1,0 +1,23 @@
+INFO:     Started server process [21672]
+INFO:     Waiting for application startup.
+{"ts": "2026-11-01T17:44:14Z", "level": "INFO", "logger": "medgraph.api", "msg": "medgraph api starting: env=development api_keys=1", "request_id": "-"}
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8765 (Press CTRL+C to quit)
+INFO:     127.0.0.1:63041 - "GET /healthz HTTP/1.1" 200 OK
+{"ts": "2026-11-01T17:44:21Z", "level": "INFO", "logger": "medgraph.api", "msg": "request", "request_id": "2e6a65721a6146f09d2f9c7a4383266a", "method": "GET", "route": "/healthz", "status": 200, "ms": 185}
+INFO:     127.0.0.1:58751 - "GET /api/ontology HTTP/1.1" 401 Unauthorized
+{"ts": "2026-11-01T17:44:21Z", "level": "INFO", "logger": "medgraph.api", "msg": "request", "request_id": "11246f5dc01b4e9f8f07828234aaed52", "method": "GET", "route": "/api/ontology", "status": 401, "ms": 10}
+INFO:     127.0.0.1:50371 - "GET /api/ontology HTTP/1.1" 200 OK
+{"ts": "2026-11-01T17:44:22Z", "level": "INFO", "logger": "medgraph.api", "msg": "request", "request_id": "34f86540623545c49d1b590b45666b1c", "method": "GET", "route": "/api/ontology", "status": 200, "ms": 79}
+INFO:     127.0.0.1:50372 - "GET /api/stats HTTP/1.1" 403 Forbidden
+{"ts": "2026-11-01T17:44:22Z", "level": "INFO", "logger": "medgraph.api", "msg": "request", "request_id": "78879f091bbc4ffe8326d689816f0a36", "method": "GET", "route": "/api/stats", "status": 403, "ms": 8}
+INFO:     127.0.0.1:62201 - "POST /api/chat HTTP/1.1" 403 Forbidden
+{"ts": "2026-11-01T17:44:22Z", "level": "INFO", "logger": "medgraph.api", "msg": "request", "request_id": "a747ed83e06d4297ab5ce8a6ce426555", "method": "POST", "route": "/api/chat", "status": 403, "ms": 67}
+INFO:     127.0.0.1:62202 - "GET /api/drug/glipizide/safety?limit=9999 HTTP/1.1" 422 Unprocessable Content
+{"ts": "2026-11-01T17:44:22Z", "level": "INFO", "logger": "medgraph.api", "msg": "request", "request_id": "66a6d1fcf49e4225a6462990c69d5977", "method": "GET", "route": "/api/drug/{name}/safety", "status": 422, "ms": 24}
+INFO:     127.0.0.1:62203 - "GET /api/drug/Glucotrol HTTP/1.1" 200 OK
+{"ts": "2026-11-01T17:44:26Z", "level": "INFO", "logger": "medgraph.api", "msg": "request", "request_id": "f8e900117da04c28b54020d75a39f7f1", "method": "GET", "route": "/api/drug/{name}", "status": 200, "ms": 2712}
+INFO:     127.0.0.1:63586 - "GET / HTTP/1.1" 200 OK
+{"ts": "2026-11-01T17:44:26Z", "level": "INFO", "logger": "medgraph.api", "msg": "request", "request_id": "5a88c23bf68b4d31be291f086595960d", "method": "GET", "route": "/", "status": 200, "ms": 311}
+INFO:     127.0.0.1:60740 - "GET /static/app.js HTTP/1.1" 200 OK
+{"ts": "2026-11-01T17:44:27Z", "level": "INFO", "logger": "medgraph.api", "msg": "request", "request_id": "135505f0dacc4433ac9afe007848d1df", "method": "GET", "route": "unmatched", "status": 200, "ms": 230}

@@ -1,0 +1,1 @@
+{"kind": "project", "project_id": "org:PRJ-7001", "name": "Kestrel Bay Battery Storage", "asset_type": "PowerPlant", "status": "construction", "capacity": 200.0, "capacity_unit": "MW", "country": "USA", "developer_ids": ["org:CO-1001"], "expected_year": 2027, "concepts": ["energy storage"], "as_of": "2026-01-01"}

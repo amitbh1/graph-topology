@@ -1,0 +1,61 @@
+# EnergyGraph local stack. Ports bind to 127.0.0.1 only; put a TLS reverse proxy in front for remote access.
+# Host ports differ from MedGraph's (7475/7688/11435/8100) so both stacks can run side by side.
+services:
+  neo4j:
+    image: neo4j:5.26-community
+    container_name: energygraph-neo4j
+    ports:
+      - "127.0.0.1:7475:7474"
+      - "127.0.0.1:7688:7687"
+    environment:
+      NEO4J_AUTH: neo4j/${NEO4J_PASSWORD:-energygraph-local}
+      NEO4J_server_memory_heap_max__size: 2G
+      NEO4J_db_transaction_timeout: 120s
+    volumes:
+      - neo4j-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:7474 >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: energygraph-ollama
+    ports:
+      - "127.0.0.1:11435:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    restart: unless-stopped
+
+  api:
+    build: .
+    container_name: energygraph-api
+    profiles: ["api"]
+    env_file: .env
+    environment:
+      ENERGYGRAPH_ENV: production
+      NEO4J_URI: bolt://neo4j:7687
+      OLLAMA_BASE_URL: http://ollama:11434
+      TIMESERIES_URL: sqlite:////app/data/timeseries.sqlite3
+    ports:
+      - "127.0.0.1:8100:8100"
+    volumes:
+      - api-data:/app/data
+    depends_on:
+      neo4j:
+        condition: service_healthy
+    read_only: true
+    tmpfs: ["/tmp"]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: ["ALL"]
+    deploy:
+      resources:
+        limits: {cpus: "2", memory: 1g}
+    restart: unless-stopped
+
+volumes:
+  neo4j-data:
+  ollama-data:
+  api-data:

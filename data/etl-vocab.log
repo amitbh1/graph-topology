@@ -1,0 +1,39 @@
+== schema
+schema: 16 constraints, 2 fulltext, 14 vector indexes
+== atc
+downloading https://raw.githubusercontent.com/fabkury/atcd/master/WHO%20ATC-DDD%202026-04-25.csv
+atc: 6996 levels
+== mesh
+downloading https://nlmpubs.nlm.nih.gov/projects/mesh/MESH_FILES/xmlmesh/desc2026.gz
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "A:\amit-sideproject\medical-agent\medgraph\__main__.py", line 105, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "A:\amit-sideproject\medical-agent\medgraph\__main__.py", line 68, in main
+    run(client, args.steps)
+    ~~~^^^^^^^^^^^^^^^^^^^^
+  File "A:\amit-sideproject\medical-agent\medgraph\etl\__init__.py", line 49, in run
+    available[step](client)
+    ~~~~~~~~~~~~~~~^^^^^^^^
+  File "A:\amit-sideproject\medical-agent\medgraph\etl\mesh.py", line 62, in load_mesh
+    records = list(parse_mesh_xml(fh))
+  File "A:\amit-sideproject\medical-agent\medgraph\etl\mesh.py", line 22, in parse_mesh_xml
+    for _, elem in ET.iterparse(fh, events=("end",)):
+                   ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\iamit\AppData\Local\Programs\Python\Python313\Lib\xml\etree\ElementTree.py", line 1244, in iterator
+    data = source.read(16 * 1024)
+  File "C:\Users\iamit\AppData\Local\Programs\Python\Python313\Lib\gzip.py", line 340, in read
+    return self._buffer.read(size)
+           ~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Users\iamit\AppData\Local\Programs\Python\Python313\Lib\_compression.py", line 68, in readinto
+    data = self.read(len(byte_view))
+  File "C:\Users\iamit\AppData\Local\Programs\Python\Python313\Lib\gzip.py", line 546, in read
+    if not self._read_gzip_header():
+           ~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\iamit\AppData\Local\Programs\Python\Python313\Lib\gzip.py", line 515, in _read_gzip_header
+    last_mtime = _read_gzip_header(self._fp)
+  File "C:\Users\iamit\AppData\Local\Programs\Python\Python313\Lib\gzip.py", line 475, in _read_gzip_header
+    raise BadGzipFile('Not a gzipped file (%r)' % magic)
+gzip.BadGzipFile: Not a gzipped file (b'<?')

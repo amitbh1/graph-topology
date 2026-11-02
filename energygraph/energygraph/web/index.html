@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EnergyGraph</title>
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<header>
+  <h1>EnergyGraph</h1>
+  <nav id="nav">
+    <button data-tab="asset" class="active">Asset</button>
+    <button data-tab="ownership">Ownership</button>
+    <button data-tab="projects">Projects</button>
+    <button data-tab="prices">Prices</button>
+    <button data-tab="search">Search</button>
+    <button data-tab="chat">Assistant</button>
+    <button data-tab="sources">Sources</button>
+  </nav>
+  <span id="me" class="muted"></span>
+  <input id="apikey" type="password" autocomplete="off" placeholder="API key">
+</header>
+<main>
+  <p class="note">Published data with sources and as-of dates. Not investment, trading or operational advice.</p>
+
+  <section id="asset" class="active">
+    <form data-run="asset"><input name="q" value="Harbor Point LNG" placeholder="Asset name or id"><button class="go">Explore</button></form>
+    <div id="asset-out"></div>
+  </section>
+  <section id="ownership">
+    <form data-run="ownership"><input name="q" value="Harbor LNG Partners" placeholder="Company or asset"><button class="go">Trace</button></form>
+    <div id="ownership-out"></div>
+  </section>
+  <section id="projects">
+    <form data-run="projects">
+      <input name="q" value="USA" placeholder="Country (ISO3)" class="short">
+      <select name="asset_type"><option value="">any type</option><option>PowerPlant</option><option>LNGTerminal</option><option>Refinery</option><option>Pipeline</option><option>Field</option><option>StorageSite</option></select>
+      <select name="status"><option value="">any status</option><option>announced</option><option>permitting</option><option>fid</option><option>construction</option><option>commissioning</option></select>
+      <button class="go">Find</button></form>
+    <div id="projects-out"></div>
+  </section>
+  <section id="prices">
+    <form data-run="prices"><input name="q" value="Example Gulf Hub" placeholder="Series, hub or commodity"><button class="go">Show</button></form>
+    <div id="prices-out"></div>
+  </section>
+  <section id="search">
+    <form data-run="search"><input name="q" value="liquefied natural gas" placeholder="Term"><button class="go">Search documents</button></form>
+    <div id="search-out"></div>
+  </section>
+  <section id="chat">
+    <div class="card"><div id="chat-log" class="chat"><div class="msg bot">Ask about assets, owners, outages, projects or prices, e.g. “Who ultimately owns Harbor Point LNG?”</div></div></div>
+    <form data-run="chat"><input name="q" class="wide" placeholder="Ask EnergyGraph…"><button class="go">Send</button></form>
+  </section>
+  <section id="sources"><div id="sources-out" class="muted">Loading…</div></section>
+</main>
+<script src="/static/app.js" defer></script>
+</body>
+</html>

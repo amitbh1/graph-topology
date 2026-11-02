@@ -1,0 +1,4 @@
+{"kind": "company", "company_id": "org:CO-1001", "name": "Kestrel Generation LLC", "country": "USA", "as_of": "2026-01-01"}
+{"kind": "asset", "asset_id": "org:PP-0001", "asset_type": "PowerPlant", "name": "Kestrel Bay Power Station", "country": "USA", "latitude": 29.9, "longitude": -93.7, "capacity": 780.0, "capacity_unit": "MW", "status": "operating", "commissioning_year": 2013, "concepts": ["natural gas"], "owners": [{"company_id": "org:CO-1001", "share": 1.0}], "operator_id": "org:CO-1001", "as_of": "2026-01-01"}
+{"kind": "asset", "asset_id": "org:PP-0002", "asset_type": "PowerPlant", "name": "Kestrel Bay Peaker", "country": "USA", "capacity": 220.0, "capacity_unit": "MW", "status": "construction", "concepts": ["natural gas"], "owners": [{"company_id": "org:CO-1001", "share": 1.0}], "as_of": "2026-01-01"}
+{"kind": "asset", "asset_id": "org:PP-BAD", "asset_type": "Windmill", "name": "Invalid sample row (wrong asset_type) — must be quarantined"}

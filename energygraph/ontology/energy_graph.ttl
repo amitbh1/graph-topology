@@ -1,0 +1,111 @@
+@prefix eg:   <https://energygraph.local/ontology#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# =============================================================================
+# EnergyGraph ontology — the structural contract for the Neo4j graph.
+#
+#   eg:keyProperty   unique identifier of the class (-> uniqueness constraint)
+#   eg:embedText     properties concatenated for embeddings (-> vector index)
+#   rdfs:subClassOf  eg:Asset  -> nodes carry BOTH labels, e.g. (:Asset:PowerPlant)
+#
+# Every node and every fact-bearing relationship must carry:
+#   source       registered data source id (see energygraph/sources/registry.py)
+#   entitlement  'public' or 'org:<dataset>' — filtered on EVERY read
+#   as_of        ISO date the fact was valid / retrieved
+#
+# Lightweight development-time contract; not an OWL reasoner.
+# =============================================================================
+
+<https://energygraph.local/ontology> a owl:Ontology ;
+    rdfs:label "EnergyGraph energy knowledge graph ontology" ;
+    owl:versionInfo "1.0.0" .
+
+eg:keyProperty a owl:AnnotationProperty .
+eg:embedText   a owl:AnnotationProperty .
+
+# ----------------------------------------------------------------------------- classes
+eg:Company a owl:Class ; rdfs:label "Company" ;
+    rdfs:comment "Legal entity (GLEIF LEI when resolved) or named owner/operator." ;
+    eg:keyProperty "company_id" ; eg:embedText "name,country" .
+
+eg:CompanyAlias a owl:Class ; rdfs:label "CompanyAlias" ;
+    rdfs:comment "Alternative / former / source-specific company name. Never a company itself." ;
+    eg:keyProperty "name" ; eg:embedText "display" .
+
+eg:Asset a owl:Class ; rdfs:label "Asset" ;
+    rdfs:comment "Physical energy asset. Every asset also carries one subtype label." ;
+    eg:keyProperty "asset_id" ; eg:embedText "name,asset_type,country" .
+
+eg:PowerPlant  a owl:Class ; rdfs:label "PowerPlant"  ; rdfs:subClassOf eg:Asset ; eg:keyProperty "asset_id" .
+eg:Refinery    a owl:Class ; rdfs:label "Refinery"    ; rdfs:subClassOf eg:Asset ; eg:keyProperty "asset_id" .
+eg:LNGTerminal a owl:Class ; rdfs:label "LNGTerminal" ; rdfs:subClassOf eg:Asset ; eg:keyProperty "asset_id" .
+eg:Pipeline    a owl:Class ; rdfs:label "Pipeline"    ; rdfs:subClassOf eg:Asset ; eg:keyProperty "asset_id" .
+eg:Field       a owl:Class ; rdfs:label "Field"       ; rdfs:subClassOf eg:Asset ; eg:keyProperty "asset_id" .
+eg:StorageSite a owl:Class ; rdfs:label "StorageSite" ; rdfs:subClassOf eg:Asset ; eg:keyProperty "asset_id" .
+
+eg:AssetAlias a owl:Class ; rdfs:label "AssetAlias" ;
+    rdfs:comment "Alternative asset name or external identifier." ;
+    eg:keyProperty "name" ; eg:embedText "display" .
+
+eg:Concept a owl:Class ; rdfs:label "Concept" ;
+    rdfs:comment "Taxonomy concept (Open Energy Ontology or organization taxonomy): fuels, technologies, commodities. Multi-parent." ;
+    eg:keyProperty "code" ; eg:embedText "label,definition" .
+
+eg:Region a owl:Class ; rdfs:label "Region" ;
+    rdfs:comment "Country (ISO 3166 alpha-3), subdivision, basin or market zone." ;
+    eg:keyProperty "code" ; eg:embedText "name" .
+
+eg:Hub a owl:Class ; rdfs:label "Hub" ;
+    rdfs:comment "Pricing / trading location." ;
+    eg:keyProperty "code" ; eg:embedText "name" .
+
+eg:Incident a owl:Class ; rdfs:label "Incident" ;
+    rdfs:comment "Reported outage or incident. A report, not a root-cause finding." ;
+    eg:keyProperty "incident_id" ; eg:embedText "incident_type,description" .
+
+eg:Project a owl:Class ; rdfs:label "Project" ;
+    rdfs:comment "Proposed / permitted / FID / under construction / cancelled project." ;
+    eg:keyProperty "project_id" ; eg:embedText "name,status" .
+
+eg:PriceSeries a owl:Class ; rdfs:label "PriceSeries" ;
+    rdfs:comment "Pointer to a published price series in the time-series store." ;
+    eg:keyProperty "series_id" ; eg:embedText "name,unit" .
+
+eg:Document a owl:Class ; rdfs:label "Document" ;
+    rdfs:comment "Filing, news item, methodology or research document." ;
+    eg:keyProperty "doc_id" ; eg:embedText "title,text" .
+
+eg:DataSource a owl:Class ; rdfs:label "DataSource" ;
+    rdfs:comment "Catalog entry for a registered data source (licence, attribution, refresh)." ;
+    eg:keyProperty "source_id" .
+
+# ----------------------------------------------------------------------------- relationships
+eg:SUBSIDIARY_OF a owl:ObjectProperty ; rdfs:domain eg:Company ; rdfs:range eg:Company ;
+    rdfs:comment "Direct accounting-consolidation parent." .
+eg:ALIAS_OF a owl:ObjectProperty ; rdfs:domain eg:CompanyAlias ; rdfs:range eg:Company .
+eg:ASSET_ALIAS_OF a owl:ObjectProperty ; rdfs:domain eg:AssetAlias ; rdfs:range eg:Asset .
+eg:OWNS a owl:ObjectProperty ; rdfs:domain eg:Company ; rdfs:range eg:Asset ;
+    rdfs:comment "Ownership with optional equity share (0-1) and as_of." .
+eg:OPERATES a owl:ObjectProperty ; rdfs:domain eg:Company ; rdfs:range eg:Asset .
+eg:LOCATED_IN a owl:ObjectProperty ; rdfs:domain eg:Asset ; rdfs:range eg:Region .
+eg:HEADQUARTERED_IN a owl:ObjectProperty ; rdfs:domain eg:Company ; rdfs:range eg:Region .
+eg:REGION_PARENT a owl:ObjectProperty ; rdfs:domain eg:Region ; rdfs:range eg:Region .
+eg:USES a owl:ObjectProperty ; rdfs:domain eg:Asset ; rdfs:range eg:Concept ;
+    rdfs:comment "Primary/secondary fuel or technology of an asset." .
+eg:CONCEPT_PARENT a owl:ObjectProperty ; rdfs:domain eg:Concept ; rdfs:range eg:Concept .
+eg:CONNECTS_TO a owl:ObjectProperty ; rdfs:domain eg:Asset ; rdfs:range eg:Asset ;
+    rdfs:comment "Physical connection in the supply network (direction of flow), optional capacity." .
+eg:HAD_INCIDENT a owl:ObjectProperty ; rdfs:domain eg:Asset ; rdfs:range eg:Incident .
+eg:DEVELOPS a owl:ObjectProperty ; rdfs:domain eg:Company ; rdfs:range eg:Project .
+eg:PROJECT_LOCATED_IN a owl:ObjectProperty ; rdfs:domain eg:Project ; rdfs:range eg:Region .
+eg:PROJECT_USES a owl:ObjectProperty ; rdfs:domain eg:Project ; rdfs:range eg:Concept .
+eg:EXPANDS a owl:ObjectProperty ; rdfs:domain eg:Project ; rdfs:range eg:Asset .
+eg:PRICED_AT a owl:ObjectProperty ; rdfs:domain eg:PriceSeries ; rdfs:range eg:Hub .
+eg:SERIES_FOR a owl:ObjectProperty ; rdfs:domain eg:PriceSeries ; rdfs:range eg:Concept .
+eg:HUB_IN a owl:ObjectProperty ; rdfs:domain eg:Hub ; rdfs:range eg:Region .
+eg:MENTIONS_ASSET a owl:ObjectProperty ; rdfs:domain eg:Document ; rdfs:range eg:Asset .
+eg:MENTIONS_COMPANY a owl:ObjectProperty ; rdfs:domain eg:Document ; rdfs:range eg:Company .
+eg:SIMILAR_TO a owl:ObjectProperty ; rdfs:domain eg:Asset ; rdfs:range eg:Asset ;
+    rdfs:comment "Exploratory peer score with explained components. Not an investment or operational recommendation." .

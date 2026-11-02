@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MedGraph</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --ink:#1d2433; --muted:#667085; --line:#e4e7ec; --accent:#2f6fde; --warn:#b54708; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--ink); }
+  header { background:var(--card); border-bottom:1px solid var(--line); padding:12px 24px; display:flex; gap:24px; align-items:center; }
+  header h1 { font-size:18px; margin:0; }
+  nav button { background:none; border:0; padding:8px 12px; border-radius:6px; cursor:pointer; color:var(--muted); font:inherit; }
+  nav button.active { background:#eaf1fd; color:var(--accent); font-weight:600; }
+  main { max-width:1100px; margin:24px auto; padding:0 24px; }
+  section { display:none; } section.active { display:block; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px 20px; margin-bottom:16px; }
+  .card h3 { margin:0 0 8px; font-size:15px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; }
+  .stat { font-size:24px; font-weight:600; } .label { color:var(--muted); font-size:12px; }
+  form { display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
+  input, select { padding:8px 10px; border:1px solid var(--line); border-radius:6px; font:inherit; min-width:260px; }
+  button.go { background:var(--accent); color:#fff; border:0; border-radius:6px; padding:8px 16px; cursor:pointer; font:inherit; }
+  table { width:100%; border-collapse:collapse; } th, td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { color:var(--muted); font-weight:500; font-size:12px; }
+  .path { display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+  .chip { background:#f2f4f7; border:1px solid var(--line); border-radius:999px; padding:2px 10px; font-size:12px; }
+  .note { color:var(--warn); font-size:12px; margin-top:8px; }
+  .muted { color:var(--muted); }
+  .chat { display:flex; flex-direction:column; gap:10px; }
+  .msg { padding:10px 14px; border-radius:10px; max-width:85%; white-space:pre-wrap; }
+  .msg.user { background:#eaf1fd; align-self:flex-end; } .msg.bot { background:var(--card); border:1px solid var(--line); }
+  .tools { font-size:12px; color:var(--muted); margin-top:6px; font-family:ui-monospace,monospace; }
+  .err { color:#b42318; }
+</style>
+</head>
+<body>
+<header>
+  <h1>MedGraph</h1>
+  <nav id="nav">
+    <button data-tab="overview" class="active">Overview</button>
+    <button data-tab="drug">Drug explorer</button>
+    <button data-tab="search">Graph-assisted search</button>
+    <button data-tab="disease">Disease</button>
+    <button data-tab="trials">Trials</button>
+    <button data-tab="chat">Assistant</button>
+    <button data-tab="ontology">Ontology</button>
+  </nav>
+  <input id="apikey" type="password" autocomplete="off" placeholder="API key" style="margin-left:auto;min-width:200px">
+</header>
+<main>
+  <p class="note">Research prototype over public data. Not medical advice. Adverse event reports are reported associations, not proof of causation.</p>
+
+  <section id="overview" class="active"><div id="overview-out" class="muted">Loading…</div></section>
+
+  <section id="drug">
+    <form data-run="drug"><input name="q" value="Glucotrol" placeholder="Brand or generic name"><button class="go">Explore</button></form>
+    <div id="drug-out"></div>
+  </section>
+
+  <section id="search">
+    <form data-run="search"><input name="q" value="Diabetes Mellitus" placeholder="Medical term"><button class="go">Search labels</button></form>
+    <div id="search-out"></div>
+  </section>
+
+  <section id="disease">
+    <form data-run="disease"><input name="q" value="diabetes mellitus" placeholder="Disease"><button class="go">Overview</button></form>
+    <div id="disease-out"></div>
+  </section>
+
+  <section id="trials">
+    <form data-run="trials"><input name="q" value="type 2 diabetes" placeholder="Condition">
+      <select name="status"><option value="">any status</option><option>RECRUITING</option><option>ACTIVE_NOT_RECRUITING</option><option>COMPLETED</option><option>NOT_YET_RECRUITING</option></select>
+      <button class="go">Find trials</button></form>
+    <div id="trials-out"></div>
+  </section>
+
+  <section id="chat">
+    <div class="card"><div id="chat-log" class="chat"><div class="msg bot">Ask about drugs, diseases, safety reports or trials, e.g. “What does MedGraph know about Glucotrol?”</div></div></div>
+    <form data-run="chat"><input name="q" style="flex:1" placeholder="Ask MedGraph…"><button class="go">Send</button></form>
+  </section>
+
+  <section id="ontology"><div id="ontology-out" class="muted">Loading…</div></section>
+</main>
+
+<script src="/static/app.js" defer></script>
+</body>
+</html>
